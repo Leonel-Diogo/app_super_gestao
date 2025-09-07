@@ -15,16 +15,13 @@ class AutenticacaoMiddleware
      * @param  \Closure(\Illuminate\Http\Request): (\Illuminate\Http\Response|\Illuminate\Http\RedirectResponse)  $next
      * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function handle(Request $request, Closure $next, $metodo_autenticacao)
+    public function handle(Request $request, Closure $next, $metodo_autenticacao = null)
     {
-        if ($metodo_autenticacao == 'padrao') {
-            echo 'Verificar o usuário e a senha no Banco';
-        }
-        #VERIFICANDO SE O USUÁRIO POSSUI ACESSO
-        if (true) {
+        session_start();
+        if (isset($_SESSION['email']) && $_SESSION['email'] != '') {
             return $next($request);
         } else {
-            return Response('Acesso negado! A rota exige autenticação');
+            return redirect()->route('site.login', ['error' => 2]);
         }
     }
 

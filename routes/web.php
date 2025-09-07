@@ -1,11 +1,14 @@
 <?php
+use App\Http\Controllers\ClienteController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LoginController;
+use App\Http\Controllers\ProdutoController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\PrincipalController;
 use App\Http\Controllers\SobreNosController;
 use App\Http\Controllers\ContatoController;
 use App\Http\Controllers\FornecedorController;
-use App\Http\Controllers\TesteController;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,14 +23,34 @@ use App\Http\Controllers\TesteController;
 #ROTAS DA APP
 Route::middleware(['log.acesso', 'autenticacao'])
     ->prefix('app')->group(function () {
+        Route::get('/home', [HomeController::class, 'index'])
+            ->name('app.home');
+        Route::get('/sair', [LoginController::class, 'logout'])
+            ->name('app.sair');
         Route::get(
             "/fornecedor",
             [FornecedorController::class, 'index']
         )->name('app.fornecedor');
         Route::get(
-            "/produto",
+            "/fornecedor/create",
             [FornecedorController::class, 'create']
+        )->name('app.fornecedor.create');
+        Route::post(
+            "/fornecedor",
+            [FornecedorController::class, 'store']
+        )->name('app.fornecedor.store');
+        Route::post(
+            "/fornecedor/select",
+            [FornecedorController::class, 'select']
+        )->name('app.fornecedor.select');
+        Route::get(
+            "/produto",
+            [ProdutoController::class, 'index']
         )->name('app.produto');
+        Route::get(
+            "/cliente",
+            [ClienteController::class, 'index']
+        )->name('app.cliente');
     });
 
 #ROTAS DO SITE
@@ -40,16 +63,21 @@ Route::prefix('site')->group(function () {
         ->middleware('log.acesso');
 
     Route::get('/contato', [ContatoController::class, 'contato'])
-        ->name('site.contato')->middleware('autenticacao:padrao');
+        ->name('site.contato');
 
     Route::post('/contato', [ContatoController::class, 'save'])
         ->name('site.contato');
+    Route::get(
+        '/login/{error?}',
+        [LoginController::class, 'index']
+    )->name('site.login');
+    Route::post(
+        '/login',
+        [LoginController::class, 'autenticar']
+    )->name('site.login');
 });
 
-Route::get(
-    '/teste/{nome}/{idade}',
-    [TesteController::class, 'teste']
-)->name('teste');
+
 
 #ROTAS FALLBACK
 Route::fallback(function () {
